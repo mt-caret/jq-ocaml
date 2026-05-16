@@ -1,0 +1,26 @@
+name: build & run tests
+
+on:
+  - push
+  - pull_request
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v6
+
+      - name: Set up dune
+        uses: ocaml-dune/setup-dune@v2
+
+      - run: dune tool install ocamlformat
+
+      - run: dune fmt
+
+      - run: dune build
+
+      - run: dune runtest

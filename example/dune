@@ -1,0 +1,5 @@
+(executable
+ (name jq_example)
+ (libraries core core_unix.command_unix jq jsonaf)
+ (preprocess
+  (pps ppx_jane)))

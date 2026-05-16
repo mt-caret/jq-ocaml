@@ -1,0 +1,53 @@
+name: publish odoc
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: read-all
+
+concurrency:
+  group: deploy-odoc
+  cancel-in-progress: true
+
+jobs:
+  deploy-odoc:
+    runs-on: ubuntu-latest
+    env:
+      # We need this environment variable or else `dune build @odoc` won't find
+      # be able to find the odoc tool installed on the previous step. This is
+      # likely a bug in dune.
+      DUNE_CONFIG__LOCK_DEV_TOOL: enabled
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      id-token: write
+      pages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up dune
+        uses: ocaml-dune/setup-dune@v2
+        with:
+          steps: install-dune enable-pkg lazy-update-depexts install-gpatch install-depexts build-deps
+
+      - run: dune tool install odoc
+
+      - run: dune build @doc
+
+      - name: Set-up Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _build/default/_doc/_html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

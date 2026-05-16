@@ -1,0 +1,6 @@
+(library
+ (name jq_test)
+ (inline_tests)
+ (libraries core jq)
+ (preprocess
+  (pps ppx_jane)))

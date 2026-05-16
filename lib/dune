@@ -1,0 +1,14 @@
+(library
+ (name jq)
+ (public_name jq)
+ (libraries core jsonaf)
+ (preprocess
+  (pps ppx_jane))
+ (foreign_stubs
+  (language c)
+  (names jq_stubs)
+  (flags -I../vendor/jq-1.7.1/src))
+ (foreign_archives
+  ../vendor/jq-1.7.1/src/jq_main
+  ../vendor/jq-1.7.1/src/decNumber/jq_decnumber)
+ (c_library_flags -lpthread -lm))
