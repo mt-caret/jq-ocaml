@@ -1,0 +1,5 @@
+(foreign_library
+ (archive_name jq_decnumber)
+ (language c)
+ (names decContext decNumber)
+ (flags :standard -Wno-unused-parameter -Wno-unused-function))
