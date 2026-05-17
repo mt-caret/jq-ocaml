@@ -86,6 +86,35 @@ let%expect_test "runtime type error" =
     |}]
 ;;
 
+let%expect_test "halt_error surfaces exit code and input message" =
+  run_and_print {|halt_error(5)|} {|"bad"|};
+  [%expect
+    {|
+    (Error
+     ("jq program failed at runtime" (err "jq: halt_error: exit code 5: bad")))
+    |}]
+;;
+
+let%expect_test "plain halt is a successful empty result" =
+  run_and_print {|halt|} "null";
+  [%expect {| (Ok ()) |}]
+;;
+
+let%expect_test "debug returns the input but drops the side channel" =
+  (* libjq's debug builtin would normally write a JSON-encoded debug event
+     to stderr; we don't install a debug_cb so the side channel is silently
+     dropped — the value still flows through unchanged. *)
+  run_and_print {|debug|} {|{"a": 1}|};
+  [%expect {| (Ok ((Object ((a (Number 1)))))) |}]
+;;
+
+let%expect_test "stderr returns the input but drops the side channel" =
+  (* Same as debug: libjq's stderr builtin would normally write the input
+     to stderr; we drop the write. *)
+  run_and_print {|stderr|} {|"hello"|};
+  [%expect {| (Ok ((String hello))) |}]
+;;
+
 let%expect_test "explicit error() call" =
   run_and_print {|error("something went wrong")|} "null";
   [%expect

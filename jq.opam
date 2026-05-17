@@ -2,9 +2,11 @@
 opam-version: "2.0"
 synopsis: "OCaml bindings to libjq for JSON querying and pretty-printing"
 description: """
-A Jane-Street-style OCaml binding to libjq (vendored). Provides a thin
-wrapper around the libjq C API for compiling and running jq programs over
-JSON values."""
+OCaml bindings to libjq (vendored). Provides a thin wrapper around the
+libjq C API for compiling and running jq programs over JSON values.
+
+The vendored libjq build assumes glibc + Linux for portability of the
+math/time functions it uses."""
 maintainer: ["Mt <mtakeda@oeconomia.jp>"]
 authors: ["Mt <mtakeda@oeconomia.jp>"]
 license: "MIT"
@@ -32,3 +34,4 @@ build: [
   ]
 ]
 x-maintenance-intent: ["(latest)"]
+available: os = "linux"

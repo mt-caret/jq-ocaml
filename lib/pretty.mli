@@ -1,5 +1,4 @@
-(** Render a [Jsonaf.t] using libjq's own formatter — the output matches
-    jq's CLI, including its number rendering and separator spacing. *)
+(** Render a [Jsonaf.t] using libjq's own formatter *)
 
 open! Core
 

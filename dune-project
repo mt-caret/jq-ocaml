@@ -14,7 +14,7 @@
  (name jq)
  (synopsis "OCaml bindings to libjq for JSON querying and pretty-printing")
  (description
-  "A Jane-Street-style OCaml binding to libjq (vendored). Provides a thin\nwrapper around the libjq C API for compiling and running jq programs over\nJSON values.")
+  "OCaml bindings to libjq (vendored). Provides a thin wrapper around the\nlibjq C API for compiling and running jq programs over JSON values.\n\nThe vendored libjq build assumes glibc + Linux for portability of the\nmath/time functions it uses.")
  (depends
   (ocaml
    (>= 5.0))
