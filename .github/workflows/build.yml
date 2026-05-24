@@ -9,6 +9,14 @@ permissions: read-all
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The OCaml compiler built by dune package management is not relocatable.
+      # With sandboxing on, dune copies only an action's declared deps into
+      # _build/.sandbox/<hash>/, so loading the compiler there fails to find
+      # lib/ocaml/Makefile.config (it dies under `dune fmt`, which builds the
+      # ocamlformat dev tool). Disabling sandboxing makes dune read the real
+      # _build/_private target path instead. See ocaml/dune#10316.
+      DUNE_SANDBOX: none
 
     steps:
       - name: Checkout tree

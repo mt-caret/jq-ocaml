@@ -19,6 +19,13 @@ jobs:
       # be able to find the odoc tool installed on the previous step. This is
       # likely a bug in dune.
       DUNE_CONFIG__LOCK_DEV_TOOL: enabled
+      # The OCaml compiler built by dune package management is not relocatable.
+      # With sandboxing on, dune copies only an action's declared deps into
+      # _build/.sandbox/<hash>/, so loading the compiler there fails to find
+      # lib/ocaml/Makefile.config (it dies under `dune build @doc`, which builds
+      # the odoc dev tool). Disabling sandboxing makes dune read the real
+      # _build/_private target path instead. See ocaml/dune#10316.
+      DUNE_SANDBOX: none
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
