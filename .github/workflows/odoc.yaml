@@ -15,18 +15,10 @@ jobs:
   deploy-odoc:
     runs-on: ubuntu-latest
     env:
-      # We need this environment variable or else `dune build @odoc` won't find
-      # be able to find the odoc tool installed on the previous step. This is
-      # likely a bug in dune.
+      # Without this, `dune build @doc` fails to find the odoc installed by
+      # `dune tool install` ("Program odoc not found in the tree or in PATH").
+      # See ocaml/dune#14235.
       DUNE_CONFIG__LOCK_DEV_TOOL: enabled
-      # `dune build @doc` builds the odoc dev tool, which loads the OCaml
-      # compiler inside a force-sandboxed action (so --sandbox/DUNE_SANDBOX are
-      # ignored). That sandbox copies the compiler binaries but not the sibling
-      # lib/ocaml/Makefile.config, so the load dies with "Makefile.config: No
-      # such file or directory". Enabling toolchains builds the compiler in the
-      # shared ~/.cache/dune/toolchains cache, which dune reads directly instead
-      # of sandbox-copying, sidestepping the bug. See ocaml/dune#10316.
-      DUNE_CONFIG__TOOLCHAINS: enabled
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -39,9 +31,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Pin to the latest stable dune instead of setup-dune's default (nightly),
+      # which crashes the dev-tool compiler load with a missing Makefile.config
+      # inside a forced sandbox. See build.yml for the full explanation.
       - name: Set up dune
         uses: ocaml-dune/setup-dune@v2
         with:
+          version: latest
           steps: install-dune enable-pkg lazy-update-depexts install-gpatch install-depexts build-deps
 
       - run: dune tool install odoc

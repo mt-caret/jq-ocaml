@@ -9,22 +9,22 @@ permissions: read-all
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      # `dune fmt` builds the ocamlformat dev tool, which loads the OCaml
-      # compiler inside a force-sandboxed action (so --sandbox/DUNE_SANDBOX are
-      # ignored). That sandbox copies the compiler binaries but not the sibling
-      # lib/ocaml/Makefile.config, so the load dies with "Makefile.config: No
-      # such file or directory". Enabling toolchains builds the compiler in the
-      # shared ~/.cache/dune/toolchains cache, which dune reads directly instead
-      # of sandbox-copying, sidestepping the bug. See ocaml/dune#10316.
-      DUNE_CONFIG__TOOLCHAINS: enabled
 
     steps:
       - name: Checkout tree
         uses: actions/checkout@v6
 
+      # Pin to the latest stable dune instead of setup-dune's default (nightly).
+      # On nightly, `dune fmt` (and `dune build @doc` in odoc.yaml) crash: they
+      # load the OCaml compiler inside a force-sandboxed action whose sandbox
+      # omits lib/ocaml/Makefile.config, so the load fails with "Makefile.config:
+      # No such file or directory". No nightly config/env escapes it (the sandbox
+      # is forced; nightly has no toolchains feature). Stable builds the compiler
+      # in the shared toolchains cache, which is read directly, avoiding the bug.
       - name: Set up dune
         uses: ocaml-dune/setup-dune@v2
+        with:
+          version: latest
 
       - run: dune tool install ocamlformat
 
